@@ -1,0 +1,11 @@
+# Ignore Visual Studio temporary files
+.vs/
+*.vsidx
+*.user
+*.suo
+*.dbmdl
+*.log
+bin/
+obj/
+publish/
+
