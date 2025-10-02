@@ -1,6 +1,8 @@
 name: Build & Push Windows Docker Image
 
 on:
+  push:
+    branches: [ "docker-development" ]
   workflow_dispatch:
     inputs:
       image_tag:
