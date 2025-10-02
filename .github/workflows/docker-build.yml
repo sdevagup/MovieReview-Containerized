@@ -46,7 +46,10 @@ jobs:
           /p:Configuration=Release `
           /p:DeployOnBuild=true `
           /p:WebPublishMethod=FileSystem `
-          /p:PublishUrl=publish
+          /p:PublishUrl="$(pwd)\publish"
+
+      - name: Verify publish output
+        run: dir publish
 
       - name: Docker Hub Login
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
