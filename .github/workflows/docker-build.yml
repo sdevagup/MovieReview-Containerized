@@ -47,7 +47,7 @@ jobs:
                 /p:publishUrl=${{ github.workspace }}\publish
 
       - name: Docker Hub Login
-        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
