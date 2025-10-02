@@ -14,8 +14,8 @@ jobs:
   build-and-push:
     runs-on: windows-2022
     permissions:
-      id-token: write   
-      contents: read  
+      id-token: write
+      contents: read
     steps:
 
       - name: Checkout repository
@@ -46,10 +46,11 @@ jobs:
           /p:Configuration=Release `
           /p:DeployOnBuild=true `
           /p:WebPublishMethod=FileSystem `
-          /p:PublishUrl="$(pwd)\publish"
+          /p:DeleteExistingFiles=True `
+          /p:PublishUrl="${{ github.workspace }}\publish"
 
-      - name: Verify publish output
-        run: dir publish
+      - name: Verify publish folder
+        run: dir "${{ github.workspace }}\publish"
 
       - name: Docker Hub Login
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
