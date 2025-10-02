@@ -44,13 +44,15 @@ jobs:
       - name: Publish Web App
         run: msbuild MovieReview.Web/MovieReview.Web.csproj `
           /p:Configuration=Release `
-          /p:DeployOnBuild=true `
           /p:WebPublishMethod=FileSystem `
           /p:DeleteExistingFiles=True `
-          /p:PublishUrl="${{ github.workspace }}\publish"
+          /p:OutDir="${{ github.workspace }}\publish\\" `
+          /p:PublishUrl="${{ github.workspace }}\publish\\"
 
       - name: Verify publish folder
-        run: dir "${{ github.workspace }}\publish"
+        run: |
+          echo "Checking publish output..."
+          dir "${{ github.workspace }}\publish"
 
       - name: Docker Hub Login
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
