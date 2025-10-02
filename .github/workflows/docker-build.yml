@@ -43,11 +43,10 @@ jobs:
 
       - name: Publish Web App
         run: msbuild MovieReview.Web/MovieReview.Web.csproj `
-                /p:Configuration=Release `
-                /p:DeployOnBuild=true `
-                /p:WebPublishMethod=FileSystem `
-                /p:DeleteExistingFiles=True `
-                /p:publishUrl=${{ github.workspace }}\publish
+          /p:Configuration=Release `
+          /p:DeployOnBuild=true `
+          /p:WebPublishMethod=FileSystem `
+          /p:PublishUrl=publish
 
       - name: Docker Hub Login
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
