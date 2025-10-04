@@ -62,6 +62,20 @@ jobs:
           echo "Publish output structure:"
           Get-ChildItem -Recurse "${{ github.workspace }}\publish" | Select-Object FullName
 
+      - name: Inject RDS Connection String into Web.config
+        run: |
+          if (-not (Test-Path "${{ github.workspace }}\publish\Web.config")) {
+            Write-Error "Web.config not found in publish folder!"
+            exit 1
+          }
+          Write-Host "Injecting RDS connection string into Web.config..."
+          (Get-Content "${{ github.workspace }}\publish\Web.config") |
+          ForEach-Object {
+            if ($_ -match '<add name="MovieReview"') {
+              '<add name="MovieReview" connectionString="' + "${{ secrets.RDS_CONNECTION_STRING }}" + '" providerName="System.Data.SqlClient" />'
+            } else { $_ }
+          } | Set-Content "${{ github.workspace }}\publish\Web.config"
+
       - name: Docker Hub Login
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
@@ -82,12 +96,6 @@ jobs:
             --tag ${{ secrets.DOCKERHUB_USERNAME }}/moviereview:${{ github.event.inputs.image_tag || 'latest' }} `
             --tag ${{ steps.login-ecr.outputs.registry }}/moviereview:${{ github.event.inputs.image_tag || 'latest' }} .
       
-      - name: Set RDS connection string env var
-        run: |
-          echo "RDS connection string set."
-        env:
-          ConnectionStrings__MovieReview: ${{ secrets.RDS_CONNECTION_STRING }}
-
       - name: Push to Docker Hub
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/moviereview:${{ github.event.inputs.image_tag || 'latest' }}
 
