@@ -12,5 +12,8 @@ namespace MovieReview.Data.Migrations
         }
 
         protected override void Seed(MovieReviewDbContext context)
+        {
+
+        }
     }
 }
