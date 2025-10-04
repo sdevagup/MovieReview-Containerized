@@ -57,6 +57,11 @@ jobs:
           echo "Checking publish output..."
           dir "${{ github.workspace }}\publish"
 
+      - name: Show publish folder tree
+        run: |
+          echo "Publish output structure:"
+          Get-ChildItem -Recurse "${{ github.workspace }}\publish" | Select-Object FullName
+
       - name: Docker Hub Login
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
