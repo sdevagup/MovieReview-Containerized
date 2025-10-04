@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
 using System.Diagnostics;
 using System.IO;
 using System.Web;
@@ -17,7 +18,7 @@ namespace MovieReview.Web
     {
         protected void Application_Start()
         {
-            string logPath = Path.Combine(Path.GetTempPath(), "startup.log");
+            string logPath = @"C:\inetpub\wwwroot\startup.log";
 
             void SafeLog(string msg)
             {
@@ -27,7 +28,7 @@ namespace MovieReview.Web
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine($"[FallbackLog] {msg} (WriteFailed: {e.Message})");
+                    Trace.WriteLine($"[FallbackLog] {msg} (LogWriteFailed: {e.Message})");
                 }
             }
 
@@ -35,14 +36,17 @@ namespace MovieReview.Web
 
             try
             {
+                // Read connection string from environment variable
                 var envConnection = Environment.GetEnvironmentVariable("ConnectionStrings__MovieReview");
+
                 if (!string.IsNullOrEmpty(envConnection))
                 {
                     var settings = ConfigurationManager.ConnectionStrings["MovieReview"];
                     if (settings == null)
                     {
-                        var cs = new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
-                        ConfigurationManager.ConnectionStrings.Add(cs);
+                        var connectionStringSettings =
+                            new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
+                        ConfigurationManager.ConnectionStrings.Add(connectionStringSettings);
                     }
                     else
                     {
@@ -56,23 +60,29 @@ namespace MovieReview.Web
                 }
                 else
                 {
-                    SafeLog("Using DB Connection from Web.config");
+                    var localConn = ConfigurationManager.ConnectionStrings["MovieReview"]?.ConnectionString;
+                    SafeLog($"Using DB Connection from Web.config: {localConn}");
                 }
 
+                // Use EF Migrations initializer
                 Database.SetInitializer(
-                    new MigrateDatabaseToLatestVersion<MovieReviewDbContext, Configuration>()
+                    new MigrateDatabaseToLatestVersion<MovieReviewDbContext, MovieReview.Data.Migrations.Configuration>()
                 );
 
+                // MVC + WebAPI initialization
                 AreaRegistration.RegisterAllAreas();
                 GlobalConfiguration.Configure(WebApiConfig.Register);
                 FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
                 RouteConfig.RegisterRoutes(RouteTable.Routes);
                 BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+                // Run migrations and test DB connection
                 using (var ctx = new MovieReviewDbContext())
                 {
                     ctx.Database.Initialize(force: true);
                     SafeLog("EF initialization triggered.");
-                    var migrator = new DbMigrator(new Configuration());
+
+                    var migrator = new DbMigrator(new MovieReview.Data.Migrations.Configuration());
                     migrator.Update();
                     SafeLog("EF migrations applied successfully.");
 
