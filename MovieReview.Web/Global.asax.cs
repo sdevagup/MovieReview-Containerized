@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using MovieReview.Data;
+using MovieReview.Data.Migrations;
 
 namespace MovieReview.Web
 {
@@ -26,7 +27,6 @@ namespace MovieReview.Web
                 }
                 catch (Exception e)
                 {
-                    // Fallback to Trace (goes to Application event log)
                     Trace.WriteLine($"[FallbackLog] {msg} (LogWriteFailed: {e.Message})");
                 }
             }
@@ -39,7 +39,6 @@ namespace MovieReview.Web
 
                 if (!string.IsNullOrEmpty(envConnection))
                 {
-                    // Step 2: Override Web.config connection
                     var settings = ConfigurationManager.ConnectionStrings["MovieReview"];
                     if (settings == null)
                     {
@@ -63,7 +62,10 @@ namespace MovieReview.Web
                     SafeLog($"Using DB Connection from Web.config: {localConn}");
                 }
 
-                Database.SetInitializer(new CreateDatabaseIfNotExists<MovieReviewDbContext>());
+                // Switch to use EF Migrations instead of just DB creation
+                Database.SetInitializer(
+                    new MigrateDatabaseToLatestVersion<MovieReviewDbContext, Configuration>()
+                );
 
                 AreaRegistration.RegisterAllAreas();
                 GlobalConfiguration.Configure(WebApiConfig.Register);
@@ -71,12 +73,11 @@ namespace MovieReview.Web
                 RouteConfig.RegisterRoutes(RouteTable.Routes);
                 BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-                // Step 5: Database test connection + creation
                 using (var ctx = new MovieReviewDbContext())
                 {
                     ctx.Database.Initialize(force: true);
                     ctx.Database.Connection.Open();
-                    SafeLog("Database initialization and connection successful!");
+                    SafeLog("Database migration and connection successful!");
                     ctx.Database.Connection.Close();
                 }
 
