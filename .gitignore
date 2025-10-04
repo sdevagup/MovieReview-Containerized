@@ -8,4 +8,6 @@
 bin/
 obj/
 publish/
+*.terraform
+*.terraform.lock.hcl
 
