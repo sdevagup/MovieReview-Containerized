@@ -17,7 +17,7 @@ namespace MovieReview.Web
     {
         protected void Application_Start()
         {
-            string logPath = @"C:\inetpub\wwwroot\startup.log";
+            string logPath = Path.Combine(Path.GetTempPath(), "startup.log");
 
             void SafeLog(string msg)
             {
@@ -27,7 +27,7 @@ namespace MovieReview.Web
                 }
                 catch (Exception e)
                 {
-                    Trace.WriteLine($"[FallbackLog] {msg} (LogWriteFailed: {e.Message})");
+                    Trace.WriteLine($"[FallbackLog] {msg} (WriteFailed: {e.Message})");
                 }
             }
 
@@ -36,15 +36,13 @@ namespace MovieReview.Web
             try
             {
                 var envConnection = Environment.GetEnvironmentVariable("ConnectionStrings__MovieReview");
-
                 if (!string.IsNullOrEmpty(envConnection))
                 {
                     var settings = ConfigurationManager.ConnectionStrings["MovieReview"];
                     if (settings == null)
                     {
-                        var connectionStringSettings =
-                            new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
-                        ConfigurationManager.ConnectionStrings.Add(connectionStringSettings);
+                        var cs = new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
+                        ConfigurationManager.ConnectionStrings.Add(cs);
                     }
                     else
                     {
@@ -58,13 +56,11 @@ namespace MovieReview.Web
                 }
                 else
                 {
-                    var localConn = ConfigurationManager.ConnectionStrings["MovieReview"]?.ConnectionString;
-                    SafeLog($"Using DB Connection from Web.config: {localConn}");
+                    SafeLog("Using DB Connection from Web.config");
                 }
 
-                // Switch to use EF Migrations instead of just DB creation
                 Database.SetInitializer(
-                    new MigrateDatabaseToLatestVersion<MovieReviewDbContext, MovieReview.Data.Migrations.Configuration>()
+                    new MigrateDatabaseToLatestVersion<MovieReviewDbContext, Configuration>()
                 );
 
                 AreaRegistration.RegisterAllAreas();
@@ -72,12 +68,16 @@ namespace MovieReview.Web
                 FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
                 RouteConfig.RegisterRoutes(RouteTable.Routes);
                 BundleConfig.RegisterBundles(BundleTable.Bundles);
-
                 using (var ctx = new MovieReviewDbContext())
                 {
                     ctx.Database.Initialize(force: true);
+                    SafeLog("EF initialization triggered.");
+                    var migrator = new DbMigrator(new Configuration());
+                    migrator.Update();
+                    SafeLog("EF migrations applied successfully.");
+
                     ctx.Database.Connection.Open();
-                    SafeLog("Database migration and connection successful!");
+                    SafeLog("Database connection successful!");
                     ctx.Database.Connection.Close();
                 }
 
