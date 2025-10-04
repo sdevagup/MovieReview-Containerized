@@ -42,11 +42,15 @@ jobs:
         run: msbuild "${{ steps.find_sln.outputs.slnPath }}" /p:Configuration=Release
 
       - name: Publish Web App
-        run: msbuild MovieReview.Web/MovieReview.Web.csproj `
-          /p:Configuration=Release `
-          /p:WebPublishMethod=FileSystem `
-          /p:DeleteExistingFiles=True `
-          /p:PublishUrl="${{ github.workspace }}\publish\\"
+        run: |
+          msbuild MovieReview.Web/MovieReview.Web.csproj `
+            /p:Configuration=Release `
+            /p:DeployOnBuild=true `
+            /p:WebPublishMethod=FileSystem `
+            /p:DeleteExistingFiles=True `
+            /p:PublishUrl="${{ github.workspace }}\publish\\" `
+            /t:WebPublish `
+            /verbosity:detailed
 
       - name: Verify publish folder
         run: |
