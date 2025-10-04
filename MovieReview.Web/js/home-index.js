@@ -53,7 +53,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
 
         var deferred = $q.defer();
 
-        $http.get('http://localhost:19595/api/movies')
+        $http.get('/api/movies')
             .then(function (result) {
                 //success  
                 angular.copy(result.data, _movies);
@@ -73,7 +73,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
 
         var deferred = $q.defer();
 
-        $http.get('http://localhost:19595/api/movies/'+Id)
+        $http.get('/api/movies/'+Id)
             .then(function(result) {
                     //success
                     deferred.resolve(result.data);
@@ -89,7 +89,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
     var _removeReview = function(Id) {
         var deferred = $q.defer();
 
-        $http.delete('http://localhost:19595/api/MovieReviews/' + Id)
+        $http.delete('/api/MovieReviews/' + Id)
             .then(function() {
                     //success
                     deferred.resolve();
@@ -104,7 +104,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
     //Deleting the Movie by id
     var _removeMovie = function(Id) {
         var deferred = $q.defer();
-        $http.delete('http://localhost:19595/api/Movies/' + Id)
+        $http.delete('/api/Movies/' + Id)
             .then(function() {
                     //success
                     deferred.resolve();
@@ -120,7 +120,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
     var _addMovie = function (newMovie) {
         var deferred = $q.defer();
 
-        $http.post('http://localhost:19595/api/movies', newMovie)
+        $http.post('/api/movies', newMovie)
            .then(function (result) {
                //Success
                var newOne = result.data;
@@ -141,7 +141,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
 
         var deferred = $q.defer();
 
-        $http.get('http://localhost:19595/api/MovieReviews/' + Id)
+        $http.get('/api/MovieReviews/' + Id)
             .then(function (result) {
                 //success  
                 angular.copy(result.data, _reviews);
@@ -160,7 +160,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
 
         var deferred = $q.defer();
 
-        $http.get('http://localhost:19595/api/Lookups/getbyreviewerid?id=' + Id)
+        $http.get('/api/Lookups/getbyreviewerid?id=' + Id)
             .then(function (result) {
                 //success  
                 // angular.copy(result.data, _singleReview);
@@ -180,7 +180,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
 
     var _addReview = function (MovieId,newReview) {
         var deferred = $q.defer();
-        $http.post('http://localhost:19595/api/MovieReviews/'+MovieId, newReview)
+        $http.post('/api/MovieReviews/'+MovieId, newReview)
             .then(function (result) {
                 //success
                 var newOne = result.data;
@@ -237,7 +237,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
     //Editing the Review
     var _NewReviewEdit = function (newReview) {
         var deferred = $q.defer();
-        $http.put('http://localhost:19595/api/MovieReviews/' , newReview)
+        $http.put('/api/MovieReviews/' , newReview)
             .then(function (result) {
                 //success
                 deferred.resolve();
@@ -252,7 +252,7 @@ module.factory("dataService", ["$http","$q",function ($http, $q) {
     //Editing the Movie
     var _movieEdit = function(Movie) {
         var deferred = $q.defer();
-        $http.put('http://localhost:19595/api/Movies/', Movie)
+        $http.put('/api/Movies/', Movie)
             .then(function() {
                     //success
                     deferred.resolve();

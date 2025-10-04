@@ -97,7 +97,7 @@ resource "aws_iam_role_policy_attachment" "ecs_secrets" {
 
 
 resource "aws_ecs_task_definition" "moviereview_task" {
-  family                   = "moviereview-task-dev"
+  family                   = "moviereview-task-${var.env}"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = "1024"
@@ -122,20 +122,7 @@ resource "aws_ecs_task_definition" "moviereview_task" {
         }
       ]
 
-      environment = [
-        { name = "DB_HOST", value = aws_db_instance.moviereview.address },
-        { name = "DB_NAME", value = "MovieReview" }
-      ]
-
       secrets = [
-        {
-          name      = "DB_USERNAME"
-          valueFrom = "arn:aws:secretsmanager:us-east-2:188244335075:secret:moviereview-db-credentials-2hUqS9:username::"
-        },
-        {
-          name      = "DB_PASSWORD"
-          valueFrom = "arn:aws:secretsmanager:us-east-2:188244335075:secret:moviereview-db-credentials-2hUqS9:password::"
-        },
         {
           name      = "ConnectionStrings__MovieReview"
           valueFrom = "arn:aws:secretsmanager:us-east-2:188244335075:secret:moviereview-db-credentials-2hUqS9:connection_string::"
@@ -145,7 +132,7 @@ resource "aws_ecs_task_definition" "moviereview_task" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "/ecs/moviereview-dev"
+          awslogs-group         = "/ecs/moviereview-${var.env}"
           awslogs-region        = "us-east-2"
           awslogs-stream-prefix = "ecs"
         }
@@ -164,16 +151,16 @@ resource "aws_cloudwatch_log_group" "ecs" {
 
 
 resource "aws_ecs_service" "moviereview_service" {
-  name            = "moviereview-service-dev"
-  cluster         = aws_ecs_cluster.moviereview.id
-  task_definition = aws_ecs_task_definition.moviereview_task.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-  platform_version = "1.0.0" 
+  name             = "moviereview-service-${var.env}"
+  cluster          = aws_ecs_cluster.moviereview.id
+  task_definition  = aws_ecs_task_definition.moviereview_task.arn
+  desired_count    = 1
+  launch_type      = "FARGATE"
+  platform_version = "1.0.0"
 
   network_configuration {
-    subnets         =  module.vpc.public_subnets
-    security_groups = [aws_security_group.ecs_sg.id]
+    subnets          = module.vpc.public_subnets
+    security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
   }
 
