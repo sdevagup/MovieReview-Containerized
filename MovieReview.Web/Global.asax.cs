@@ -15,22 +15,18 @@ namespace MovieReview.Web
     {
         protected void Application_Start()
         {
-            // Try to read connection string from environment variable
             var envConnection = Environment.GetEnvironmentVariable("ConnectionStrings__MovieReview");
 
             if (!string.IsNullOrEmpty(envConnection))
             {
-                // Update EF’s configuration connection string dynamically
                 var settings = ConfigurationManager.ConnectionStrings["MovieReview"];
                 if (settings == null)
                 {
-                    // Create if not present
                     var connectionStringSettings = new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
                     ConfigurationManager.ConnectionStrings.Add(connectionStringSettings);
                 }
                 else
                 {
-                    // Override if it exists
                     typeof(ConfigurationElement).GetField("_bReadOnly", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
                         ?.SetValue(settings, false);
                     settings.ConnectionString = envConnection;
@@ -44,17 +40,19 @@ namespace MovieReview.Web
                 Trace.WriteLine($"[Startup] Using DB Connection from Web.config: {localConn}");
             }
 
-            // Set EF initializer so tables are auto-created if needed
             Database.SetInitializer<MovieReviewDbContext>(new CreateDatabaseIfNotExists<MovieReviewDbContext>());
 
-            // Standard ASP.NET MVC + Web API registrations
+            using (var ctx = new MovieReviewDbContext())
+            {
+                ctx.Database.Initialize(force: false);
+            }
+
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            // Optionally log a quick test connection
             try
             {
                 using (var ctx = new MovieReviewDbContext())
