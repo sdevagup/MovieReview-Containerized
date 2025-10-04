@@ -46,7 +46,6 @@ jobs:
           /p:Configuration=Release `
           /p:WebPublishMethod=FileSystem `
           /p:DeleteExistingFiles=True `
-          /p:OutDir="${{ github.workspace }}\publish\\" `
           /p:PublishUrl="${{ github.workspace }}\publish\\"
 
       - name: Verify publish folder
