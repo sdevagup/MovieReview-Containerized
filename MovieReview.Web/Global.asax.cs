@@ -16,53 +16,50 @@ namespace MovieReview.Web
     {
         protected void Application_Start()
         {
-            // Log startup to file
-            try
+            string logPath = @"C:\inetpub\wwwroot\startup.log";
+
+            void SafeLog(string msg)
             {
-                var logPath = @"C:\inetpub\wwwroot\startup.log";
-                File.AppendAllText(logPath, $"{DateTime.UtcNow:u} - Application_Start() triggered{Environment.NewLine}");
-            }
-            catch (Exception ex)
-            {
-                // Log file write failure to Trace if it happens
-                Trace.WriteLine($"[Startup] Failed to write to startup.log: {ex.Message}");
+                try
+                {
+                    File.AppendAllText(logPath, $"[{DateTime.Now}] {msg}{Environment.NewLine}");
+                }
+                catch
+                {
+                    Trace.WriteLine($"[FallbackLog] {msg}");
+                }
             }
 
-            // Resolve connection string (from ENV or Web.config) ---
+            SafeLog("==== Application_Start triggered ====");
+
             var envConnection = Environment.GetEnvironmentVariable("ConnectionStrings__MovieReview");
 
             if (!string.IsNullOrEmpty(envConnection))
             {
-                try
+                var settings = ConfigurationManager.ConnectionStrings["MovieReview"];
+                if (settings == null)
                 {
-                    var settings = ConfigurationManager.ConnectionStrings["MovieReview"];
-                    if (settings == null)
-                    {
-                        var connectionStringSettings = new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
-                        ConfigurationManager.ConnectionStrings.Add(connectionStringSettings);
-                    }
-                    else
-                    {
-                        typeof(ConfigurationElement)
-                            .GetField("_bReadOnly", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                            ?.SetValue(settings, false);
-                        settings.ConnectionString = envConnection;
-                    }
+                    var connectionStringSettings =
+                        new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
+                    ConfigurationManager.ConnectionStrings.Add(connectionStringSettings);
+                }
+                else
+                {
+                    typeof(ConfigurationElement).GetField("_bReadOnly",
+                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                        ?.SetValue(settings, false);
+                    settings.ConnectionString = envConnection;
+                }
 
-                    Trace.WriteLine($"[Startup] Using DB Connection from ENV: {envConnection}");
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine($"[Startup] Failed to override connection string: {ex.Message}");
-                }
+                SafeLog($"Using DB Connection from ENV: {envConnection}");
             }
             else
             {
                 var localConn = ConfigurationManager.ConnectionStrings["MovieReview"]?.ConnectionString;
-                Trace.WriteLine($"[Startup] Using DB Connection from Web.config: {localConn}");
+                SafeLog($"Using DB Connection from Web.config: {localConn}");
             }
 
-            Database.SetInitializer<MovieReviewDbContext>(new CreateDatabaseIfNotExists<MovieReviewDbContext>());
+            Database.SetInitializer(new CreateDatabaseIfNotExists<MovieReviewDbContext>());
 
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
@@ -76,17 +73,16 @@ namespace MovieReview.Web
                 {
                     ctx.Database.Initialize(force: true);
                     ctx.Database.Connection.Open();
-                    Trace.WriteLine("[Startup] Database initialization and connection successful!");
-                    File.AppendAllText(@"C:\inetpub\wwwroot\startup.log", $"{DateTime.UtcNow:u} - Database initialization successful{Environment.NewLine}");
+                    SafeLog("Database initialization and connection successful!");
                     ctx.Database.Connection.Close();
                 }
             }
             catch (Exception ex)
             {
-                var err = $"[Startup] Database initialization FAILED: {ex.Message}";
-                Trace.WriteLine(err);
-                File.AppendAllText(@"C:\inetpub\wwwroot\startup.log", $"{DateTime.UtcNow:u} - {err}{Environment.NewLine}");
+                SafeLog($"Database initialization FAILED: {ex}");
             }
+
+            SafeLog("==== Application_Start complete ====");
         }
     }
 }
