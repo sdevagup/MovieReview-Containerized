@@ -64,7 +64,7 @@ namespace MovieReview.Web
 
                 // Switch to use EF Migrations instead of just DB creation
                 Database.SetInitializer(
-                    new MigrateDatabaseToLatestVersion<MovieReviewDbContext, Configuration>()
+                    new MigrateDatabaseToLatestVersion<MovieReviewDbContext, MovieReview.Data.Migrations.Configuration>()
                 );
 
                 AreaRegistration.RegisterAllAreas();
