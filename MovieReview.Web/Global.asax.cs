@@ -40,12 +40,9 @@ namespace MovieReview.Web
                 Trace.WriteLine($"[Startup] Using DB Connection from Web.config: {localConn}");
             }
 
-            Database.SetInitializer<MovieReviewDbContext>(new CreateDatabaseIfNotExists<MovieReviewDbContext>());
-
-            using (var ctx = new MovieReviewDbContext())
-            {
-                ctx.Database.Initialize(force: false);
-            }
+            Database.SetInitializer<MovieReviewDbContext>(
+                new CreateDatabaseIfNotExists<MovieReviewDbContext>()
+            );
 
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
@@ -57,14 +54,15 @@ namespace MovieReview.Web
             {
                 using (var ctx = new MovieReviewDbContext())
                 {
+                    ctx.Database.Initialize(force: true);
                     ctx.Database.Connection.Open();
-                    Trace.WriteLine("[Startup] Database connection successful!");
+                    Trace.WriteLine("[Startup] Database initialization and connection successful!");
                     ctx.Database.Connection.Close();
                 }
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"[Startup] Database connection FAILED: {ex.Message}");
+                Trace.WriteLine($"[Startup] Database initialization FAILED: {ex.Message}");
             }
         }
     }
