@@ -24,51 +24,54 @@ namespace MovieReview.Web
                 {
                     File.AppendAllText(logPath, $"[{DateTime.Now}] {msg}{Environment.NewLine}");
                 }
-                catch
+                catch (Exception e)
                 {
-                    Trace.WriteLine($"[FallbackLog] {msg}");
+                    // Fallback to Trace (goes to Application event log)
+                    Trace.WriteLine($"[FallbackLog] {msg} (LogWriteFailed: {e.Message})");
                 }
             }
 
             SafeLog("==== Application_Start triggered ====");
 
-            var envConnection = Environment.GetEnvironmentVariable("ConnectionStrings__MovieReview");
-
-            if (!string.IsNullOrEmpty(envConnection))
+            try
             {
-                var settings = ConfigurationManager.ConnectionStrings["MovieReview"];
-                if (settings == null)
+                var envConnection = Environment.GetEnvironmentVariable("ConnectionStrings__MovieReview");
+
+                if (!string.IsNullOrEmpty(envConnection))
                 {
-                    var connectionStringSettings =
-                        new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
-                    ConfigurationManager.ConnectionStrings.Add(connectionStringSettings);
+                    // Step 2: Override Web.config connection
+                    var settings = ConfigurationManager.ConnectionStrings["MovieReview"];
+                    if (settings == null)
+                    {
+                        var connectionStringSettings =
+                            new ConnectionStringSettings("MovieReview", envConnection, "System.Data.SqlClient");
+                        ConfigurationManager.ConnectionStrings.Add(connectionStringSettings);
+                    }
+                    else
+                    {
+                        typeof(ConfigurationElement).GetField("_bReadOnly",
+                            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                            ?.SetValue(settings, false);
+                        settings.ConnectionString = envConnection;
+                    }
+
+                    SafeLog($"Using DB Connection from ENV: {envConnection}");
                 }
                 else
                 {
-                    typeof(ConfigurationElement).GetField("_bReadOnly",
-                        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                        ?.SetValue(settings, false);
-                    settings.ConnectionString = envConnection;
+                    var localConn = ConfigurationManager.ConnectionStrings["MovieReview"]?.ConnectionString;
+                    SafeLog($"Using DB Connection from Web.config: {localConn}");
                 }
 
-                SafeLog($"Using DB Connection from ENV: {envConnection}");
-            }
-            else
-            {
-                var localConn = ConfigurationManager.ConnectionStrings["MovieReview"]?.ConnectionString;
-                SafeLog($"Using DB Connection from Web.config: {localConn}");
-            }
+                Database.SetInitializer(new CreateDatabaseIfNotExists<MovieReviewDbContext>());
 
-            Database.SetInitializer(new CreateDatabaseIfNotExists<MovieReviewDbContext>());
+                AreaRegistration.RegisterAllAreas();
+                GlobalConfiguration.Configure(WebApiConfig.Register);
+                FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+                RouteConfig.RegisterRoutes(RouteTable.Routes);
+                BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            AreaRegistration.RegisterAllAreas();
-            GlobalConfiguration.Configure(WebApiConfig.Register);
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            try
-            {
+                // Step 5: Database test connection + creation
                 using (var ctx = new MovieReviewDbContext())
                 {
                     ctx.Database.Initialize(force: true);
@@ -76,13 +79,13 @@ namespace MovieReview.Web
                     SafeLog("Database initialization and connection successful!");
                     ctx.Database.Connection.Close();
                 }
+
+                SafeLog("==== Application_Start complete ====");
             }
             catch (Exception ex)
             {
-                SafeLog($"Database initialization FAILED: {ex}");
+                SafeLog($"[Startup Fatal Error] {ex}");
             }
-
-            SafeLog("==== Application_Start complete ====");
         }
     }
 }
