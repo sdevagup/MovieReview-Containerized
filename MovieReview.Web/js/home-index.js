@@ -11,7 +11,7 @@ module.config([
 
     // ✅ Enable hashbang routing for IIS/ALB compatibility
     // Using '!' ensures routes like #!/movies work properly
-    $locationProvider.html5Mode(false).hashPrefix("!");
+    $locationProvider.html5Mode(false).hashPrefix('');
 
     // ✅ Define application routes (relative paths only — no leading '/')
     $routeProvider
