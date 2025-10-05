@@ -1,30 +1,30 @@
 ﻿<!DOCTYPE html>
-<html lang="en" data-ng-app="@ViewBag.InitModule">
+<html lang="en" ng-app="MovieReviewApp">
 <head>
     <title>Movie Review</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
 
-    <!-- Core CSS -->
-    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
-    <link href="~/Content/toastr.min.css" rel="stylesheet" />
-    <link href="~/Content/style.css" rel="stylesheet" />
-    <link href="~/Content/style-desktop.css" rel="stylesheet" />
-    <link href="~/Content/style-mobile.css" rel="stylesheet" />
+    <!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+    <!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+    <!--[if lte IE 9]><link rel="stylesheet" href="css/ie/v9.css" /><![endif]-->
 
-    <!-- Modernizr -->
-    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
 </head>
-<body class="homepage" ng-cloak>
+
+<body class="homepage">
 
     <!-- Header -->
     <div id="header-wrapper">
         <div class="container">
             <header id="header">
                 <div class="inner">
-                    <h1><a href="#/">MOVIE REVIEW</a></h1>
+                    <!-- Logo -->
+                    <h1><a href="#/">Movie Review</a></h1>
+
+                    <!-- Nav -->
                     <nav id="nav">
                         <ul>
                             <li><a href="#/">Home</a></li>
@@ -36,13 +36,14 @@
         </div>
     </div>
 
-    <!-- Main -->
+    <!-- Main Wrapper -->
     <div id="main-wrapper">
         <div class="wrapper style3">
             <div class="inner">
                 <div class="container">
                     <div class="row">
                         <div class="8u">
+                            <!-- Feature 1 -->
                             <section class="box article-list">
                                 @RenderBody()
                             </section>
@@ -53,25 +54,52 @@
         </div>
     </div>
 
-    <!-- Footer -->
+    <!-- Footer Wrapper -->
     <div id="footer-wrapper">
         <footer id="footer" class="container">
             <div class="row">
                 <div class="12u">
+                    <!-- About -->
                     <section>
                         <h2><strong>Movie Review</strong> by Rahul Sahay</h2>
                         <p>
-                            Hi! This is <strong>Rahul</strong>, I made this app using ASP.NET MVC 5, Entity Framework, and AngularJS.
-                            It's a significant effort to build a <strong>Single Page App</strong> using these technologies.
+                            Hi! This is <strong>Rahul</strong>, I made this app using ASP.NET MVC 5, Entity Framework, Angular, HTML 5
+                            and using design patterns like Solid Principles, Unit of Work Pattern, Repository Pattern and many more out of the box things.
+                            It's a significant effort to build a <strong>Single Page App</strong> by using bunch of technologies.
                         </p>
+                        <a href="http://myview.rahulnivi.net" class="button alt icon fa-arrow-circle-right">Learn More</a>
+                    </section>
+
+                    <!-- Contact -->
+                    <section>
+                        <h2>Get in touch</h2>
+                        <div>
+                            <div class="row">
+                                <div class="6u">
+                                    <dl class="contact">
+                                        <dt>Twitter</dt>
+                                        <dd><a href="https://twitter.com/rahulsahay19">@rahulsahay19</a></dd>
+                                        <dt>Facebook</dt>
+                                        <dd><a href="https://www.facebook.com/rahulsahay19">Rahul Sahay</a></dd>
+                                        <dt>My Blog</dt>
+                                        <dd><a href="http://myview.rahulnivi.net">My View</a></dd>
+                                        <dt>LinkedIn</dt>
+                                        <dd><a href="http://in.linkedin.com/in/rahulsahay19/">My Profile</a></dd>
+                                        <dt>.Net Daily</dt>
+                                        <dd><a href="https://paper.li/rahulsahay19/1417409532#!headlines">.Net News</a></dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
                     </section>
                 </div>
             </div>
+
             <div class="row">
                 <div class="12u">
                     <div id="copyright">
                         <ul class="menu">
-                            <li>&copy; Movie Review. All rights reserved</li>
+                            <li>&copy; My View. All rights reserved</li>
                         </ul>
                     </div>
                 </div>
@@ -80,17 +108,20 @@
     </div>
 
     <!-- Scripts -->
-    <script src="~/Scripts/jquery-2.1.1.min.js"></script>
-    <script src="~/Scripts/bootstrap.min.js"></script>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
 
-    <!-- Angular and SPA Scripts -->
+    <!-- Load Angular and App Scripts -->
     <script src="~/Scripts/angular.min.js"></script>
     <script src="~/Scripts/angular-route.min.js"></script>
-    <script src="~/Scripts/angular-sanitize.min.js"></script>
     <script src="~/Scripts/toastr.min.js"></script>
+
+    <!-- Load Angular app files -->
     <script src="~/Scripts/init.js"></script>
-    <script src="~/Scripts/home-index.js"></script>
+    <script src="~/js/home-index.js"></script>
+    <script src="~/js/home-movie-edit.js"></script>
 
     @RenderSection("scripts", required: false)
+
 </body>
 </html>
