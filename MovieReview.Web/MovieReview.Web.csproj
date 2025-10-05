@@ -611,7 +611,7 @@
     <Content Include="templates\newReview.html" />
     <Content Include="templates\reviews.html" />
     <Content Include="testpage.html" />
-    <None Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Web API Tests\MovieAPI.js" />
     <Content Include="Web API Tests\MoviesAPI.html" />
     <Content Include="Web API Tests\qunit-utils.js" />

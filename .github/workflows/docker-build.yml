@@ -1,0 +1,114 @@
+name: Build & Push Windows Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Tag for the Docker image'
+        required: true
+        default: 'latest'
+
+jobs:
+  build-and-push:
+    runs-on: windows-2022
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Find solution file
+        id: find_sln
+        shell: pwsh
+        run: |
+          $sln = Get-ChildItem -Recurse -Filter *.sln | Select-Object -First 1
+          if (-not $sln) { throw "No solution file found!" }
+          echo "slnPath=$($sln.FullName)" >> $env:GITHUB_OUTPUT
+
+      - name: Restore NuGet packages
+        run: nuget restore "${{ steps.find_sln.outputs.slnPath }}"
+
+      - name: Build solution
+        run: msbuild "${{ steps.find_sln.outputs.slnPath }}" /p:Configuration=Release
+
+      - name: Publish Web App
+        run: |
+          msbuild MovieReview.Web/MovieReview.Web.csproj `
+            /p:Configuration=Release `
+            /p:DeployOnBuild=true `
+            /p:WebPublishMethod=FileSystem `
+            /p:DeleteExistingFiles=True `
+            /p:PublishUrl="${{ github.workspace }}\publish\\" `
+            /t:WebPublish `
+            /verbosity:detailed
+
+      - name: Verify publish folder
+        run: dir "${{ github.workspace }}\publish"
+
+      - name: Inject RDS Connection String into Web.config
+        run: |
+          if (-not (Test-Path "${{ github.workspace }}\publish\Web.config")) {
+            Write-Error "Web.config not found in publish folder!"
+            exit 1
+          }
+          Write-Host "Injecting RDS connection string into Web.config..."
+          (Get-Content "${{ github.workspace }}\publish\Web.config") |
+          ForEach-Object {
+            if ($_ -match '<add name="MovieReview"') {
+              '<add name="MovieReview" connectionString="' + "${{ secrets.RDS_CONNECTION_STRING }}" + '" providerName="System.Data.SqlClient" />'
+            } else { $_ }
+          } | Set-Content "${{ github.workspace }}\publish\Web.config"
+
+      - name: Docker Hub Login
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.ACCOUNT_ID }}:role/github-actions-role
+          aws-region: us-east-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker Image
+        run: |
+          docker build `
+            --file Dockerfile `
+            --tag ${{ secrets.DOCKERHUB_USERNAME }}/moviereview:${{ github.event.inputs.image_tag || 'latest' }} `
+            --tag ${{ steps.login-ecr.outputs.registry }}/moviereview:${{ github.event.inputs.image_tag || 'latest' }} .
+      
+      - name: Push to Docker Hub
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/moviereview:${{ github.event.inputs.image_tag || 'latest' }}
+
+      - name: Push to Amazon ECR
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/moviereview:${{ github.event.inputs.image_tag || 'latest' }}
+
+  trigger-deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deploy Workflow
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "deploy-ecs.yml",  
+              ref: "docker-development",       
+              inputs: {
+                image_tag: "${{ github.event.inputs.image_tag || 'latest' }}"
+              }
+            })
