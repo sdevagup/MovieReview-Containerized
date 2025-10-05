@@ -33,8 +33,22 @@
         </div>
     </div>
 
-    <!-- Main Angular View -->
-    <div id="main-wrapper" ng-view></div>
+    <!-- Main Wrapper -->
+    <div id="main-wrapper">
+        <div class="wrapper style3">
+            <div class="inner">
+                <div class="container">
+                    <div class="row">
+                        <div class="8u">
+                            <!-- Angular view injection point -->
+                            <section class="box article-list" ng-view></section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Footer -->
     <div id="footer-wrapper">
