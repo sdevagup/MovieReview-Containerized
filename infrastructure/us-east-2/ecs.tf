@@ -126,7 +126,7 @@ resource "aws_ecs_task_definition" "moviereview_task" {
       secrets = [
         {
           name      = "ConnectionStrings__MovieReview"
-          valueFrom = "arn:aws:secretsmanager:us-east-2:188244335075:secret:moviereview-db-credentials-2hUqS9:connection_string::"
+          valueFrom = "${data.aws_secretsmanager_secret.db.arn}:connection_string::"
         }
       ]
 
