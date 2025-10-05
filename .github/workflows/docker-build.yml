@@ -53,14 +53,7 @@ jobs:
             /verbosity:detailed
 
       - name: Verify publish folder
-        run: |
-          echo "Checking publish output..."
-          dir "${{ github.workspace }}\publish"
-
-      - name: Show publish folder tree
-        run: |
-          echo "Publish output structure:"
-          Get-ChildItem -Recurse "${{ github.workspace }}\publish" | Select-Object FullName
+        run: dir "${{ github.workspace }}\publish"
 
       - name: Inject RDS Connection String into Web.config
         run: |
@@ -101,3 +94,22 @@ jobs:
 
       - name: Push to Amazon ECR
         run: docker push ${{ steps.login-ecr.outputs.registry }}/moviereview:${{ github.event.inputs.image_tag || 'latest' }}
+
+  trigger-deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deploy Workflow
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "deploy-ecs.yml",  
+              ref: "master",       
+              inputs: {
+                image_tag: "${{ github.event.inputs.image_tag || 'latest' }}"
+              }
+            })

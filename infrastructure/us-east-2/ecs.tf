@@ -114,6 +114,7 @@ resource "aws_ecs_task_definition" "moviereview_task" {
       name      = "moviereview-windows"
       image     = "${data.aws_ecr_repository.moviereview.repository_url}:latest"
       essential = true
+      "enableExecuteCommand": true
 
       portMappings = [
         {

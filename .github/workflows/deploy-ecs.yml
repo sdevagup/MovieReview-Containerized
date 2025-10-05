@@ -1,27 +1,70 @@
-name: Deploy to ECS with Terraform
+name: Deploy to ECS (Terraform + ECS CLI)
 
 on:
   workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag to deploy (e.g. latest or v1.0.2)'
+        required: true
+        default: 'latest'
+  workflow_call:
+    inputs:
+      image_tag:
+        required: true
+        type: string
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-
-      - name: Terraform Init
-        run: terraform init
-
-      - name: Configure AWS credentials
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.ACCOUNT_ID }}:role/github-actions-role
           aws-region: us-east-2
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y awscli unzip jq
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Determine Image URI
+        id: image
+        run: |
+          echo "uri=${{ secrets.ECR_REGISTRY }}/moviereview:${{ inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "Image URI: ${{ secrets.ECR_REGISTRY }}/moviereview:${{ inputs.image_tag }}"
+
+      - name: Conditional Deployment (Terraform vs ECS CLI)
+        run: |
+          IMAGE_URI="${{ steps.image.outputs.uri }}"
+          echo "Deploying image: $IMAGE_URI"
+
+          if [ "${{ inputs.image_tag }}" = "latest" ]; then
+            echo "Using 'latest' tag → skipping Terraform → forcing ECS redeployment..."
+            aws ecs update-service \
+              --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+              --service ${{ secrets.ECS_SERVICE_NAME }} \
+              --force-new-deployment \
+              --region us-east-2
+          else
+            echo "🟢 Versioned tag detected → deploying through Terraform..."
+            cd MovieReview-Angular\infrastructure\us-east-2\
+            terraform init -input=false
+            terraform apply -auto-approve -var="image_uri=$IMAGE_URI"
+          fi
+
+      - name: Confirm ECS Service Status
+        run: |
+          echo "Checking ECS service status..."
+          aws ecs describe-services \
+            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
+            --services ${{ secrets.ECS_SERVICE_NAME }} \
+            --region us-east-2 \
+            --query "services[0].{ServiceName:serviceName,Status:status,TaskDef:taskDefinition,RunningCount:runningCount,PendingCount:pendingCount}"
