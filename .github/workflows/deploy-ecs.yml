@@ -1,4 +1,4 @@
-name: Deploy to ECS (Terraform + ECS CLI)
+name: Deploy to ECS
 
 on:
   workflow_dispatch:
