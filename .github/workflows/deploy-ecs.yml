@@ -1,6 +1,8 @@
 name: Deploy to ECS (Terraform + ECS CLI)
 
 on:
+  push:
+    branches: [ "docker-development" ]
   workflow_dispatch:
     inputs:
       image_tag:
