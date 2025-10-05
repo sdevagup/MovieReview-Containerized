@@ -62,7 +62,7 @@ jobs:
 
       - name: Confirm ECS Service Status
         run: |
-          echo "Checking ECS service status..."
+          echo "Checking ECS service status"
           aws ecs describe-services \
             --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
             --services ${{ secrets.ECS_SERVICE_NAME }} \
