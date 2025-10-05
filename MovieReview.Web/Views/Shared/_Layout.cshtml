@@ -6,18 +6,11 @@
     <meta name="description" content="" />
     <meta name="keywords" content="" />
 
-    <!--[if lte IE 8]><script src="@Url.Content("~/Content/HTML5/ie/html5shiv.js")"></script><![endif]-->
-    <!--[if lte IE 8]><link rel="stylesheet" href="@Url.Content("~/Content/HTML5/ie/v8.css")" /><![endif]-->
-    <!--[if lte IE 9]><link rel="stylesheet" href="@Url.Content("~/Content/HTML5/ie/v9.css")" /><![endif]-->
+    <!--[if lte IE 8]><script src="@Url.Content("~/css/ie/html5shiv.js")"></script><![endif]-->
+    <!--[if lte IE 8]><link rel="stylesheet" href="@Url.Content("~/css/ie/v8.css")" /><![endif]-->
+    <!--[if lte IE 9]><link rel="stylesheet" href="@Url.Content("~/css/ie/v9.css")" /><![endif]-->
 
-    <!-- Core styles -->
-    <link href="@Url.Content("~/Content/HTML5/skel.css")" rel="stylesheet" />
-    <link href="@Url.Content("~/Content/HTML5/style.css")" rel="stylesheet" />
-    <link href="@Url.Content("~/Content/HTML5/style-desktop.css")" rel="stylesheet" />
-    <link href="@Url.Content("~/Content/HTML5/style-mobile.css")" rel="stylesheet" />
-    <link href="@Url.Content("~/Content/font-awesome.min.css")" rel="stylesheet" />
-    <link href="@Url.Content("~/Content/toastr.min.css")" rel="stylesheet" />
-
+    @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
 
@@ -123,8 +116,8 @@
     <script src="@Url.Content("~/Scripts/toastr.min.js")"></script>
 
     <!-- Angular App -->
-    <script src="@Url.Content("~/Scripts/home-index.js")"></script>
-    <script src="@Url.Content("~/Scripts/home-movie-edit.js")"></script>
+    <script src="@Url.Content("~/js/home-index.js")"></script>
+    <script src="@Url.Content("~/js/home-movie-edit.js")"></script>
 
     @RenderSection("scripts", required: false)
 </body>
