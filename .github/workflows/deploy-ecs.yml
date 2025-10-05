@@ -54,7 +54,7 @@ jobs:
               --force-new-deployment \
               --region us-east-2
           else
-            echo "🟢 Versioned tag detected → deploying through Terraform..."
+            echo "Versioned tag detected → deploying through Terraform..."
             cd MovieReview-Angular\infrastructure\us-east-2\
             terraform init -input=false
             terraform apply -auto-approve -var="image_uri=$IMAGE_URI"
