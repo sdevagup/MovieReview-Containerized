@@ -1,35 +1,23 @@
 ﻿<!DOCTYPE html>
 <html lang="en" ng-app="homeIndex">
 <head>
-    <title>Movie Review</title>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="description" content="" />
-    <meta name="keywords" content="" />
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - Movie Review</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!--[if lte IE 8]>
-        <script src="css/ie/html5shiv.js"></script>
-    <![endif]-->
-    <!--[if lte IE 8]>
-        <link rel="stylesheet" href="css/ie/v8.css" />
-    <![endif]-->
-    <!--[if lte IE 9]>
-        <link rel="stylesheet" href="css/ie/v9.css" />
-    <![endif]-->
-
+    <!-- Styles -->
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
 
 <body class="homepage">
+
     <!-- Header -->
     <div id="header-wrapper">
         <div class="container">
             <header id="header">
                 <div class="inner">
-                    <!-- Logo -->
                     <h1><a href="#/">Movie Review</a></h1>
-
-                    <!-- Navigation -->
                     <nav id="nav">
                         <ul>
                             <li><a href="#/">Home</a></li>
@@ -41,14 +29,14 @@
         </div>
     </div>
 
-    <!-- Main Wrapper -->
+    <!-- Main Content -->
     <div id="main-wrapper">
         <div class="wrapper style3">
             <div class="inner">
                 <div class="container">
                     <div class="row">
                         <div class="8u">
-                            <!-- Angular view renders here -->
+                            <!-- Angular View -->
                             <section class="box article-list" ng-view></section>
                         </div>
                     </div>
@@ -76,31 +64,17 @@
 
                     <section>
                         <h2>Get in touch</h2>
-                        <div class="row">
-                            <div class="6u">
-                                <dl class="contact">
-                                    <dt>Twitter</dt>
-                                    <dd><a href="https://twitter.com/rahulsahay19">@@rahulsahay19</a></dd>
-                                    <dt>Facebook</dt>
-                                    <dd><a href="https://www.facebook.com/rahulsahay19">Rahul Sahay</a></dd>
-                                    <dt>My Blog</dt>
-                                    <dd><a href="http://myview.rahulnivi.net">My View</a></dd>
-                                    <dt>LinkedIn</dt>
-                                    <dd><a href="http://in.linkedin.com/in/rahulsahay19/">My Profile</a></dd>
-                                </dl>
-                            </div>
-                        </div>
+                        <dl class="contact">
+                            <dt>Twitter</dt>
+                            <dd><a href="https://twitter.com/rahulsahay19">@@rahulsahay19</a></dd>
+                            <dt>Facebook</dt>
+                            <dd><a href="https://www.facebook.com/rahulsahay19">Rahul Sahay</a></dd>
+                            <dt>Blog</dt>
+                            <dd><a href="http://myview.rahulnivi.net">My View</a></dd>
+                            <dt>LinkedIn</dt>
+                            <dd><a href="http://in.linkedin.com/in/rahulsahay19/">My Profile</a></dd>
+                        </dl>
                     </section>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="12u">
-                    <div id="copyright">
-                        <ul class="menu">
-                            <li>&copy; My View. All rights reserved.</li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </footer>
@@ -110,14 +84,16 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
 
-    <!-- Angular core libraries -->
+    <!-- AngularJS core -->
     <script src="~/Scripts/angular.min.js"></script>
     <script src="~/Scripts/angular-route.min.js"></script>
     <script src="~/Scripts/toastr.min.js"></script>
 
-    <!-- Angular app modules -->
+    <!-- App scripts -->
     <script src="~/Scripts/init.js"></script>
     <script src="~/js/home-index.js"></script>
     <script src="~/js/home-movie-edit.js"></script>
+
+    @RenderSection("scripts", required: false)
 </body>
 </html>
