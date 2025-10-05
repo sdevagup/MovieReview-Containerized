@@ -1,39 +1,46 @@
 ﻿//home-index.js
 
-//Defined Module
+// Defined Module
 var module = angular.module("homeIndex", ["homemovieEdit"]);
 
-//Defined Routes
-module.config(["$routeProvider",function ($routeProvider) {
-    $routeProvider.when("/", {
-        controller: "HomeController",
-        templateUrl: "templates/home.html"
-    });
+// Defined Routes
+module.config([
+  "$routeProvider",
+  "$locationProvider",
+  function ($routeProvider, $locationProvider) {
 
-    $routeProvider.when("/newMovie", {
-        controller: "newMovieController",
-        templateUrl: "templates/newMovie.html"
-    });
+      // Force hashbang routing for consistent URLs behind ALB/IIS
+      $locationProvider.html5Mode(false).hashPrefix('!');
 
-    $routeProvider.when("/movies", {
-        controller: "HomeController",
-        templateUrl: "templates/movies.html"
-    });
+      // Route: Home
+      $routeProvider.when("/", {
+          controller: "HomeController",
+          // Use relative path (no leading slash)
+          templateUrl: "templates/home.html"
+      });
 
- 
-    $routeProvider.when("/reviews/:Id", {
-        controller: "reviewsController",
-        templateUrl: "templates/reviews.html"
-    });
+      // Route: Add new movie
+      $routeProvider.when("/newMovie", {
+          controller: "newMovieController",
+          templateUrl: "templates/newMovie.html"
+      });
 
+      // Route: Movies list
+      $routeProvider.when("/movies", {
+          controller: "HomeController",
+          templateUrl: "templates/movies.html"
+      });
 
-    //$routeProvider.when("/editReview/:Id", {
-    //    controller: "reviewsController",
-    //    templateUrl: "templates/editReview.html"
-    //});
+      // Route: Reviews by movie id
+      $routeProvider.when("/reviews/:Id", {
+          controller: "reviewsController",
+          templateUrl: "templates/reviews.html"
+      });
 
-    $routeProvider.otherwise({ redirectTo: "/" });
-}]);
+      // Default route
+      $routeProvider.otherwise({ redirectTo: "/" });
+  }
+]);
 
 //SRP for Data Service. This will serve as single interface for 
 //taking and submitting data

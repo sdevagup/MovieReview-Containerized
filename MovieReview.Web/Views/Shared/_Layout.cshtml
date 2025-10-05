@@ -1,29 +1,27 @@
 ﻿<!DOCTYPE html>
-<html lang="en" ng-app="homeIndex">
+<html lang="en" ng-app="homeIndex"> <!-- ✅ Use actual Angular module name -->
 <head>
     <title>Movie Review</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
 
-    <!--[if lte IE 8]><script src="@Url.Content("~/css/ie/html5shiv.js")"></script><![endif]-->
-    <!--[if lte IE 8]><link rel="stylesheet" href="@Url.Content("~/css/ie/v8.css")" /><![endif]-->
-    <!--[if lte IE 9]><link rel="stylesheet" href="@Url.Content("~/css/ie/v9.css")" /><![endif]-->
+    <!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+    <!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+    <!--[if lte IE 9]><link rel="stylesheet" href="css/ie/v9.css" /><![endif]-->
 
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
 
 <body class="homepage">
+
     <!-- Header -->
     <div id="header-wrapper">
         <div class="container">
             <header id="header">
                 <div class="inner">
-                    <!-- Logo -->
                     <h1><a href="#/">Movie Review</a></h1>
-
-                    <!-- Nav -->
                     <nav id="nav">
                         <ul>
                             <li><a href="#/">Home</a></li>
@@ -43,7 +41,6 @@
                     <div class="row">
                         <div class="8u">
                             <section class="box article-list">
-                                <!-- Angular View Outlet -->
                                 <div ng-view></div>
                             </section>
                         </div>
@@ -53,52 +50,43 @@
         </div>
     </div>
 
-    <!-- Footer Wrapper -->
+    <!-- Footer -->
     <div id="footer-wrapper">
         <footer id="footer" class="container">
             <div class="row">
                 <div class="12u">
-                    <!-- About -->
                     <section>
                         <h2><strong>Movie Review</strong> by Rahul Sahay</h2>
                         <p>
-                            Hi! This is <strong>Rahul</strong>, I made this app using ASP.NET MVC 5, Entity Framework, Angular, HTML 5
-                            and using design patterns like Solid Principles, Unit of Work Pattern, Repository Pattern and many more out of the box things.
-                            It's a significant effort to build a <strong>Single Page App</strong> by using bunch of technologies.
+                            Hi! This is <strong>Rahul</strong>, I made this app using ASP.NET MVC 5, Entity Framework,
+                            Angular, HTML 5, and using design patterns like SOLID, Unit of Work, Repository Pattern and more.
                         </p>
                         <a href="http://myview.rahulnivi.net" class="button alt icon fa-arrow-circle-right">Learn More</a>
                     </section>
-
-                    <!-- Contact -->
                     <section>
                         <h2>Get in touch</h2>
-                        <div>
-                            <div class="row">
-                                <div class="6u">
-                                    <dl class="contact">
-                                        <dt>Twitter</dt>
-                                        <dd><a href="https://twitter.com/rahulsahay19">@@rahulsahay19</a></dd>
-                                        <dt>Facebook</dt>
-                                        <dd><a href="https://www.facebook.com/rahulsahay19">Rahul Sahay</a></dd>
-                                        <dt>My Blog</dt>
-                                        <dd><a href="http://myview.rahulnivi.net">My View</a></dd>
-                                        <dt>LinkedIn</dt>
-                                        <dd><a href="http://in.linkedin.com/in/rahulsahay19/">My Profile</a></dd>
-                                        <dt>.Net Daily</dt>
-                                        <dd><a href="https://paper.li/rahulsahay19/1417409532#!headlines">.Net News</a></dd>
-                                    </dl>
-                                </div>
+                        <div class="row">
+                            <div class="6u">
+                                <dl class="contact">
+                                    <dt>Twitter</dt>
+                                    <dd><a href="https://twitter.com/rahulsahay19">@@rahulsahay19</a></dd>
+                                    <dt>Facebook</dt>
+                                    <dd><a href="https://www.facebook.com/rahulsahay19">Rahul Sahay</a></dd>
+                                    <dt>My Blog</dt>
+                                    <dd><a href="http://myview.rahulnivi.net">My View</a></dd>
+                                    <dt>LinkedIn</dt>
+                                    <dd><a href="http://in.linkedin.com/in/rahulsahay19/">My Profile</a></dd>
+                                </dl>
                             </div>
                         </div>
                     </section>
                 </div>
             </div>
-
             <div class="row">
                 <div class="12u">
                     <div id="copyright">
                         <ul class="menu">
-                            <li>&copy; My View. All rights reserved</li>
+                            <li>&copy; My View. All rights reserved.</li>
                         </ul>
                     </div>
                 </div>
@@ -106,18 +94,16 @@
         </footer>
     </div>
 
-    <!-- jQuery & Bootstrap -->
+    <!-- Scripts -->
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
 
-    <!-- Angular Core -->
-    <script src="@Url.Content("~/Scripts/angular.min.js")"></script>
-    <script src="@Url.Content("~/Scripts/angular-route.min.js")"></script>
-    <script src="@Url.Content("~/Scripts/toastr.min.js")"></script>
-
-    <!-- Angular App -->
-    <script src="@Url.Content("~/js/home-index.js")"></script>
-    <script src="@Url.Content("~/js/home-movie-edit.js")"></script>
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/angular-route.min.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    <script src="~/Scripts/init.js"></script>
+    <script src="~/js/home-index.js"></script>
+    <script src="~/js/home-movie-edit.js"></script>
 
     @RenderSection("scripts", required: false)
 </body>
