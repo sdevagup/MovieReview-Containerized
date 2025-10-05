@@ -7,29 +7,29 @@ var module = angular.module("homeIndex", ["homemovieEdit"]);
 module.config(["$routeProvider",function ($routeProvider) {
     $routeProvider.when("/", {
         controller: "HomeController",
-        templateUrl: "/templates/home.html"
+        templateUrl: "templates/home.html"
     });
 
     $routeProvider.when("/newMovie", {
         controller: "newMovieController",
-        templateUrl: "/templates/newMovie.html"
+        templateUrl: "templates/newMovie.html"
     });
 
     $routeProvider.when("/movies", {
         controller: "HomeController",
-        templateUrl: "/templates/movies.html"
+        templateUrl: "templates/movies.html"
     });
 
  
     $routeProvider.when("/reviews/:Id", {
         controller: "reviewsController",
-        templateUrl: "/templates/reviews.html"
+        templateUrl: "templates/reviews.html"
     });
 
 
     //$routeProvider.when("/editReview/:Id", {
     //    controller: "reviewsController",
-    //    templateUrl: "/templates/editReview.html"
+    //    templateUrl: "templates/editReview.html"
     //});
 
     $routeProvider.otherwise({ redirectTo: "/" });
